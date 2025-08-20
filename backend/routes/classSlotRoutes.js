@@ -1,19 +1,38 @@
 
 // backend/routes/classSlotRoutes.js
 
+
 import express from 'express';
-import { authenticate } from '../middleware/auth.js';
 import ClassSlotController from '../controllers/classSlotController.js';
+import { authenticate } from '../middleware/auth.js';
+import { makeSupabaseClient } from '../config/supabase.js';
 
 const router = express.Router();
 
-// List all slots
-router.get('/slots', authenticate, ClassSlotController.getAll);
-// Search slots by day & group
-router.get('/slots/search', authenticate, ClassSlotController.getByDayAndGroup);
-// Create a new slot
+const attachSupabase = (req, _res, next) => {
+    req.supabase = makeSupabaseClient(); // server-side client
+    next();
+};
+
+// PUBLIC
+router.get('/slots', attachSupabase, ClassSlotController.getAll);
+router.get('/slots/search', attachSupabase, ClassSlotController.getByDayAndGroup);
+
+// PROTECTED
 router.post('/slots', authenticate, ClassSlotController.create);
-// Delete a slot
 router.delete('/slots/:id', authenticate, ClassSlotController.delete);
+
+// TEMP: debug endpoint to verify what Supabase returns (remove after testing)
+router.get('/slots/_debug', attachSupabase, async (req, res, next) => {
+    try {
+        const { data, error, count } = await req.supabase
+            .from('class_slots')
+            .select('*', { count: 'exact' })
+            .limit(2);
+        if (error) return next(error);
+        res.json({ count, sample: data });
+    } catch (e) { next(e); }
+});
+
 
 export default router;
