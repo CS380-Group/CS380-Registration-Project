@@ -7,6 +7,8 @@ import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
+console.log("[routes] userRoutes module loaded");
+
 // Public: signup and signin
 router.post('/signup', UserController.signUp);
 router.post('/signin', UserController.signIn);

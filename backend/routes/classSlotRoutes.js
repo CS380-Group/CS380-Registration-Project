@@ -6,11 +6,12 @@ import express from 'express';
 import ClassSlotController from '../controllers/classSlotController.js';
 import { authenticate } from '../middleware/auth.js';
 import { makeSupabaseClient } from '../config/supabase.js';
+import { supabaseAdmin } from '../config/supabase.js';
 
 const router = express.Router();
 
 const attachSupabase = (req, _res, next) => {
-    req.supabase = makeSupabaseClient(); // server-side client
+    req.supabase = supabaseAdmin; // admin client for public read
     next();
 };
 
