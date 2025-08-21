@@ -5,6 +5,7 @@ import { AppBar, Toolbar, Typography, Button, Box, Link as MuiLink } from "@mui/
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import supabase from "../config/supabase.js";
 import { useUser } from "../contexts/UserContext.jsx";
+import { useData } from "../contexts/UserContext";
 
 const navLinks = [
     { label: "Home", to: "/" },
@@ -16,6 +17,9 @@ export default function NavBar() {
     const [user, setUser] = useState(null);
     const { setUserData } = useUser();
     const navigate = useNavigate();
+    const { userData } = useData();  // get it from context
+
+    const email = userData?.email;
 
     useEffect(() => {
         const loadUser = async () => {
@@ -71,14 +75,9 @@ export default function NavBar() {
                     ))}
                 </Box>
 
-                {user ? (
+                {email ? (
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Typography>
-                            Welcome,{" "}
-                            {user.user_metadata?.full_name ??
-                                user.user_metadata?.display_name ??
-                                user.email}
-                        </Typography>
+                        <Typography variant="body2">Welcome, {email}</Typography>
                         <Button color="inherit" onClick={handleSignOut}>
                             Sign Out
                         </Button>
@@ -93,6 +92,7 @@ export default function NavBar() {
                         </Button>
                     </Box>
                 )}
+
             </Toolbar>
         </AppBar>
     );

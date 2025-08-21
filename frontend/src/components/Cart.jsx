@@ -69,9 +69,9 @@ export default function Cart() {
                         <TableBody>
                             {cart.map((item, idx) => {
                                 const key = item?.id ?? idx; // fallback key if no id
-                                const group = item?.group ?? "—";
-                                const time = item?.time ?? "—";
-                                const cost = typeof item?.cost === "number" ? item.cost.toFixed(2) : String(item?.cost ?? "—");
+                                const group = item?.group_type ?? "—";
+                                const time = item?.start_time && item?.end_time ? `${item.start_time}–${item.end_time}` : "—";
+                                const cost = typeof item?.price_cents === "number" ? (item.price_cents / 100).toFixed(2) : "—";
 
                                 return (
                                     <TableRow key={key}>

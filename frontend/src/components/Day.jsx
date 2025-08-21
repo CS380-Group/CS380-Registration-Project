@@ -4,6 +4,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const Day = ({ day, onClick }) => {
+    const display = typeof day === "number" ? day : (day?.date ? day.date.getDate() : "");
     return (
         <div
             onClick={onClick}
@@ -15,13 +16,13 @@ const Day = ({ day, onClick }) => {
                 textAlign: "center"
             }}
         >
-            {day}
+            {display}
         </div>
     );
 };
 
 Day.propTypes = {
-    day: PropTypes.number.isRequired,
+    day: PropTypes.oneOfType([PropTypes.number, PropTypes.object]).isRequired,
     onClick: PropTypes.func
 };
 

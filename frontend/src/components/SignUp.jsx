@@ -27,15 +27,12 @@
  */
 
 
-
-// src/SignUp.jsx
-
 // frontend/src/components/SignUp.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import supabase from "../config/supabase.js";
 
-// ✅ Deep MUI imports (match SignIn style)
+// MUI imports
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -58,39 +55,37 @@ export default function SignUp() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitError("");
-        setSubmitSuccess("");
 
-        if (!name.trim()) {
-            setSubmitError("Please enter your name.");
-            return;
-        }
-        if (!/\S+@\S+\.\S+/.test(email)) {
-            setSubmitError("Please enter a valid email.");
-            return;
-        }
-        if (password.length < 6) {
-            setSubmitError("Password must be at least 6 characters.");
-            return;
-        }
+        try {
+            const res = await fetch("/api/users/signin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+            const result = await res.json();
+            if (!res.ok) {
+                setSubmitError(result.error || "Sign-in failed");
+                return;
+            }
+            const { access_token } = result;
+            localStorage.setItem("access_token", access_token);
+            setUserData({ email, access_token });
+            navigate("/");
 
-        const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { full_name: name },
-                // After email confirmation, send them to Sign In
-                emailRedirectTo: `${window.location.origin}/signin`,
-            },
-        });
-
-        if (error) {
-            setSubmitError(error.message);
-            return;
+            // Optionally: store remembered credentials for autofill (not required for auth)
+            if (remember) {
+                try {
+                    localStorage.setItem(
+                        "savedCredentials",
+                        JSON.stringify({
+                            [email]: { password, savedAt: Date.now() },
+                        })
+                    );
+                } catch {}
+            }
+        } catch (error) {
+            setSubmitError("Sign-in failed. Try again later.");
         }
-
-        // Keep it simple: prompt user to sign in now
-        setSubmitSuccess("Account created! Please check your email, then sign in.");
-        setTimeout(() => navigate("/signin"), 800);
     };
 
     return (

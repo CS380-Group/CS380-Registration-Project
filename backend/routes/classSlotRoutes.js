@@ -5,7 +5,7 @@
 import express from 'express';
 import ClassSlotController from '../controllers/classSlotController.js';
 import { authenticate } from '../middleware/auth.js';
-import { makeSupabaseClient } from '../config/supabase.js';
+//import { makeSupabaseClient } from '../config/supabase.js';
 import { supabaseAdmin } from '../config/supabase.js';
 
 const router = express.Router();
